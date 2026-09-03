@@ -137,7 +137,7 @@ class StudentDatabase:
         return self.cursor.fetchone()
 
 
-if __name__ == "__main__":
-    connection = sqlite3.connect("deni_huru.db")
-    db = StudentDatabase(connection)
-    print("Tables created successfully")
+# if __name__ == "__main__":
+#     connection = sqlite3.connect("deni_huru.db")
+#     db = StudentDatabase(connection)
+#     print("Tables created successfully")
