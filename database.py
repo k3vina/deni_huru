@@ -88,6 +88,7 @@ class StudentDatabase:
         total_loan = self.cursor.fetchone()[0] or 0
         return total_loan
 
+
     def get_total_savings(self, student_id):
         self.cursor.execute("SELECT SUM(amount) FROM savings WHERE student_id = ?", (student_id,))
         total_savings = self.cursor.fetchone()[0] or 0
@@ -99,7 +100,7 @@ class StudentDatabase:
         total_savings = self.get_total_savings(student_id)
         return total_loan - total_savings
 
-
+        
     # updates the student's information
     def update_student(self, full_name, age, institution, course, id):
         self.cursor.execute("UPDATE students SET full_name = ?, age = ? , institution = ?, course = ? WHERE id = ?", (full_name, age, institution, course, id,))
