@@ -6,6 +6,48 @@ import sqlite3
 import io
 import csv
 
+st.set_page_config(page_title="Deni Huru", layout="wide")
+
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+.stApp {
+    background-color: #12211B;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+h1, h2, h3 {
+    font-family: 'Fraunces', serif !important;
+    color: #F1EDE1 !important;
+}
+p, span, label, div {
+    color: #F1EDE1;
+}
+.stMetric {
+    background-color: #1A2B23;
+    border: 0.5px solid #2E4437;
+    border-radius: 14px;
+    padding: 1rem;
+}
+div[data-testid="stForm"] {
+    background-color: #1A2B23;
+    border: 0.5px solid #2E4437;
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+}
+.stButton > button {
+    background-color: #2E6B5A;
+    color: #F1EDE1;
+    border: 0.5px solid #4FB89D;
+    border-radius: 8px;
+}
+.stDataFrame {
+    border: 0.5px solid #2E4437;
+    border-radius: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # EXPORTS SAVINGS AND LOANS TO A CSV FILE
 def to_csv(rows, headers):
     output = io.StringIO()
@@ -35,42 +77,55 @@ if "mode" not in st.session_state:
 
 # --- SHOWS LOGIN PAGE ---
 def show_login():
-    st.subheader("Login")
-    name = st.text_input("Enter your full name:")
-    clicked = st.button("Continue", key="login_continue")
+    col1, col2, col3 = st.columns([1, 1.2, 1])
+    with col2:
+        with st.container(border=True):
+            st.subheader("Login")
+            name = st.text_input("Enter your full name:")
+            clicked = st.button("Continue", key="login_continue")
 
-    if clicked:
-        result = db.find_student_by_name(name)
-        if result is not None:
-            st.session_state.student_id = result[0]
-            st.rerun()
-        else:
-            st.write("Student not found.")
+            if clicked:
+                result = db.find_student_by_name(name)
+                if result is not None:
+                    st.session_state.student_id = result[0]
+                    st.rerun()
+                else:
+                    st.write("Student not found.")
 
-    if st.button("Register instead"):
-        st.session_state.mode = "register"
-        st.rerun()
+            if st.button("Register instead"):
+                st.session_state.mode = "register"
+                st.rerun()
 
 
 # ---- SHOWS REGISTER PAGE ---
 def show_register():
-    st.subheader("Register your details")
 
-    with st.form("Register form"):
-        reg_name = st.text_input("Full name")
-        reg_age = st.number_input("Age", min_value=0, step=1)
-        reg_institution = st.text_input("Institution")
-        reg_course = st.text_input("Course")
-        register_clicked = st.form_submit_button("Register")
+    col1, col2, col3 = st.columns([1, 1.2, 1])
 
-        if register_clicked:
-            new_student = model.Student(reg_name, reg_age, reg_institution, reg_course)
-            db.add_student(new_student)
-            st.success(f"Registered {reg_name}")
-            lookup = db.find_student_by_name(reg_name)
-            st.session_state.student_id = lookup[0]
-            st.rerun()
+    with col2:
+        with st.container(border=True):
+            st.header("Register your details")
 
+            with st.form("Register form"):
+
+                reg_name = st.text_input("Full name")
+                reg_age = st.number_input("Age", min_value=0, step=1)
+                reg_institution = st.text_input("Institution")
+                reg_course = st.text_input("Course")
+                register_clicked = st.form_submit_button("Register", key="register_continue")
+                back_button = st.form_submit_button("Back")
+
+                if register_clicked:
+                    new_student = model.Student(reg_name, reg_age, reg_institution, reg_course)
+                    db.add_student(new_student)
+                    st.success(f"Registered {reg_name}")
+                    lookup = db.find_student_by_name(reg_name)
+                    st.session_state.student_id = lookup[0]
+                    st.rerun()
+
+                if back_button:
+                    st.session_state.mode = "login"
+                    st.rerun()
 
 # --- ADD LOANS FORM ---
 def add_loan(student_id):
@@ -106,7 +161,7 @@ def add_savings(student_id):
 
 # --- SHOWS THE DASHBOARD ---
 def show_dashboard():
-    st.subheader("Dashboard")
+    st.header("Dashboard")
 
     student_id = st.session_state.student_id
     student = db.get_student(student_id)
@@ -115,8 +170,17 @@ def show_dashboard():
         return
     st.subheader(f"Welcome, {student[1]}")
 
+    total_loan = db.get_total_loan(student_id)
+    total_savings = db.get_total_savings(student_id)
     remaining = db.get_remaining_loan(student_id)
-    st.metric("Remaining Loan:", f"{remaining:.2f} bob")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Loan", f"Ksh. {total_loan:.2f}")
+    with col2:
+        st.metric("Total Saved", f"Ksh.{total_savings:.2f}")
+    with col3:
+        st.metric("Remaining", f"Ksh. {remaining:.2f}")
 
     # --- Loan History ---
     st.write("### Loan History")
