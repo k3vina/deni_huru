@@ -16,11 +16,12 @@ def show_login():
     with col2:
         with st.container(border=True):
             st.subheader("Login")
-            name = st.text_input("Enter your full name:")
+            name_input = st.text_input("Enter your full name:")
             password = st.text_input("Password", type="password")
             clicked = st.button("Continue", key="login_continue")
 
             if clicked:
+                name = name_input.title().strip()
                 hashed = hash_password(password)
                 result = db.verify_password(name, hashed)
                 if result is not None:
@@ -54,13 +55,18 @@ def show_register():
                 back_button = st.form_submit_button("Back")
 
                 if register_clicked:
-                    hashed = hash_password(reg_password)
-                    new_student = model.Student(reg_name, reg_age, reg_institution, reg_course, hashed)
-                    db.add_student(new_student)
-                    st.success(f"Registered {reg_name}")
-                    lookup = db.find_student_by_name(reg_name)
-                    st.session_state.student_id = lookup[0]
-                    st.rerun()
+                    if not reg_name.strip():
+                        st.error("Please enter your full name.")
+                    elif not reg_password:
+                        st.error("Please enter a password.")
+                    else:
+                        clean_name = reg_name.title().strip()
+                        hashed = hash_password(reg_password)
+                        new_student = model.Student(clean_name, reg_age, reg_institution, reg_course, hashed)
+                        new_id = db.add_student(new_student)
+                        st.session_state.student_id = new_id
+                        st.success(f"Registered {clean_name}")
+                        st.rerun()
 
                 if back_button:
                     st.session_state.mode = "login"

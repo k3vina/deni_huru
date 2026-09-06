@@ -55,6 +55,7 @@ class StudentDatabase:
         self.cursor.execute("INSERT INTO students (full_name, age, institution, course, password) VALUES (?, ?, ?, ?, ?)",
         (student.full_name, student.age, student.institution, student.course, student.password))
         self.connection.commit()
+        return self.cursor.lastrowid
 
     
     def verify_password(self, full_name, password_hash):
