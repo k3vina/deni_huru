@@ -1,12 +1,13 @@
 from datetime import date
 
 class Student:
-    def __init__(self, full_name, age, institution, course, id=None):
+    def __init__(self, full_name, age, institution, course, password, id=None):
         self.id = id
         self.full_name = full_name
         self.age = age
         self.institution = institution
         self.course = course
+        self.password = password
 
     def display_info(self):
         #print(f"id: {self.id}")
@@ -48,10 +49,10 @@ class Savings:
         print(f"Date: {self.date}")
 
 
-if __name__ == "__main__":
-    student_name = Student("Liam Wafula", 19, "University of Nairobi", "Data Science")
-    loan_received = Loans("1", 2024, "HELB", 24000, date(2026, 8, 13))
-    savings_amount = Savings("1", 10000, date(2026, 8, 26))
-    student_name.display_info()
-    loan_received.display_info()
-    savings_amount.display_info()
+# if __name__ == "__main__":
+#     student_name = Student("Liam Wafula", 19, "University of Nairobi", "Data Science")
+#     loan_received = Loans("1", 2024, "HELB", 24000, date(2026, 8, 13))
+#     savings_amount = Savings("1", 10000, date(2026, 8, 26))
+#     student_name.display_info()
+#     loan_received.display_info()
+#     savings_amount.display_info()

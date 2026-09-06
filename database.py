@@ -43,12 +43,23 @@ class StudentDatabase:
                             """)
         self.connection.commit()
 
+        try:
+            self.cursor.execute("ALTER TABLE students ADD COLUMN password TEXT")
+            self.connection.commit()
+        except sqlite3.OperationalError:
+            pass
+
 
      # adds the student's info
     def add_student(self, student):
-        self.cursor.execute("INSERT INTO students (full_name, age, institution, course) VALUES (?, ?, ?, ?)",
-        (student.full_name, student.age, student.institution, student.course))
+        self.cursor.execute("INSERT INTO students (full_name, age, institution, course, password) VALUES (?, ?, ?, ?, ?)",
+        (student.full_name, student.age, student.institution, student.course, student.password))
         self.connection.commit()
+
+    
+    def verify_password(self, full_name, password_hash):
+        self.cursor.execute("SELECT * FROM students WHERE full_name = ? AND password = ?", (full_name, password_hash,))
+        return self.cursor.fetchone()
 
 
     # adds the loan's info
@@ -109,7 +120,13 @@ class StudentDatabase:
 
     # update the student's loan information
     def update_loan(self, academic_year, loan_name, principal_amount, date_received, loan_id):
-        self.cursor.execute("UPDATE loans SET academic_year = ?, loan_name = ?, principal_amount = ?, date_received = ? where loan_id = ?", (academic_year, loan_name, principal_amount, date_received, loan_id,))
+        self.cursor.execute("UPDATE loans SET academic_year = ?, loan_name = ?, principal_amount = ?, date_received = ? WHERE loan_id = ?", (academic_year, loan_name, principal_amount, date_received, loan_id,))
+        self.connection.commit()
+
+
+    # updaes saving;s information
+    def update_savings(self, amount, date, entry_id):
+        self.cursor.execute("UPDATE savings SET amount = ?, date = ? WHERE entry_id = ?", (amount, date, entry_id,))
         self.connection.commit()
 
     
